@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>香港十八行政分區快問快答 Hong Kong 18 Districts Quiz</title>
+  <style>
+    :root {
+      --bg-main: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --btn-blue: #2563eb;
+      --btn-blue-hover: #1d4ed8;
+      --blue-team: #0284c7;
+      --red-team: #e11d48;
+      --correct-color: #16a34a;
+      --wrong-color: #dc2626;
+      --font-family: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 1200px;
+      padding: 1rem;
+      margin: 0 auto;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* Home Screen Styles */
+    .home-card {
+      background: var(--card-bg);
+      padding: 2.5rem 2rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 100%;
+      max-width: 550px;
+      border: 3px solid #e2e8f0;
+    }
+
+    .home-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+
+    .home-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-weight: 600;
+    }
+
+    .mode-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffffff;
+      background-color: var(--btn-blue);
+      border: none;
+      border-radius: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+      transition: transform 0.1s ease, background-color 0.15s ease;
+    }
+
+    .mode-btn:active {
+      transform: scale(0.97);
+      background-color: var(--btn-blue-hover);
+    }
+
+    /* Single Player Game Styles */
+    .game-container {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 1rem 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      border: 2px solid #e2e8f0;
+    }
+
+    .info-badge {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .timer-badge {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #d97706;
+      background: #fef3c7;
+      padding: 0.25rem 1rem;
+      border-radius: 0.75rem;
+      border: 2px solid #fde68a;
+    }
+
+    .score-badge {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--btn-blue);
+    }
+
+    .question-card {
+      background: var(--card-bg);
+      border-radius: 1.5rem;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      border: 4px solid #cbd5e1;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .district-zh {
+      font-size: 3.2rem;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+
+    .district-en {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Options Buttons Layout (Unified Blue Color) */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .option-btn {
+      background-color: var(--btn-blue);
+      color: #ffffff;
+      border: none;
+      border-radius: 1.25rem;
+      padding: 1.5rem 0.5rem;
+      font-size: 1.6rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 0px #1d4ed8, 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+
+    .option-btn .opt-en {
+      font-size: 0.85rem;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    .option-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0px #1d4ed8, 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+    }
+
+    /* Feedback Animations */
+    .flash-correct {
+      border-color: var(--correct-color) !important;
+      background-color: #f0fdf4 !important;
+      animation: popGreen 0.15s ease-out;
+    }
+
+    .flash-wrong {
+      border-color: var(--wrong-color) !important;
+      background-color: #fef2f2 !important;
+      animation: shakeRed 0.15s ease-out;
+    }
+
+    @keyframes popGreen {
+      0% { transform: scale(0.98); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes shakeRed {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+
+    /* Dual Player Smartboard Screen */
+    .dual-screen-container {
+      width: 100vw;
+      height: 100vh;
+      max-width: 100%;
+      display: flex;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: #cbd5e1;
+    }
+
+    .dual-side {
+      flex: 1;
+      height: 100%;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .side-blue {
+      background-color: #f0f9ff;
+      border-right: 4px solid #0284c7;
+    }
+
+    .side-red {
+      background-color: #fff1f2;
+      border-left: 4px solid #e11d48;
+    }
+
+    .dual-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 0.75rem 1.25rem;
+      border-radius: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .team-title {
+      font-size: 1.6rem;
+      font-weight: 900;
+    }
+
+    .side-blue .team-title { color: var(--blue-team); }
+    .side-red .team-title { color: var(--red-team); }
+
+    .dual-question-card {
+      background: #ffffff;
+      border-radius: 1.5rem;
+      padding: 2rem 1rem;
+      text-align: center;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+      border: 4px solid #94a3b8;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 1rem 0;
+    }
+
+    .dual-question-card .district-zh {
+      font-size: 3rem;
+    }
+
+    /* Extra Wide/Large buttons for Dual Smartboard */
+    .dual-options-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+
+    .dual-option-btn {
+      background-color: var(--btn-blue);
+      color: #ffffff;
+      border: none;
+      border-radius: 1.25rem;
+      padding: 2rem 0.5rem;
+      font-size: 1.8rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 6px 0px #1d4ed8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .dual-option-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0px #1d4ed8;
+    }
+
+    .dual-timer-center {
+      position: absolute;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      background: #1e293b;
+      color: #fef3c7;
+      border: 4px solid #f59e0b;
+      padding: 0.5rem 1.5rem;
+      border-radius: 2rem;
+      font-size: 2.2rem;
+      font-weight: 900;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    /* Modals & Inputs */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.75);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      width: 100%;
+      max-width: 520px;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+      border: 3px solid #cbd5e1;
+    }
+
+    .input-group {
+      margin: 1.5rem 0;
+      text-align: left;
+    }
+
+    .input-label {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .name-input {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.3rem;
+      font-weight: 700;
+      border: 3px solid #cbd5e1;
+      border-radius: 0.75rem;
+      outline: none;
+    }
+
+    .name-input:focus {
+      border-color: var(--btn-blue);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px dashed #e2e8f0;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      color: var(--btn-blue);
+      font-weight: 800;
+    }
+
+    .result-winner-banner {
+      font-size: 2.2rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+    }
+
+    /* Responsiveness for mobile screens */
+    @media (max-width: 640px) {
+      .district-zh { font-size: 2.4rem; }
+      .option-btn { font-size: 1.3rem; padding: 1.25rem 0.25rem; }
+      .dual-option-btn { font-size: 1.3rem; padding: 1.25rem 0.25rem; }
+      .dual-question-card .district-zh { font-size: 2.2rem; }
+      .dual-timer-center { font-size: 1.5rem; padding: 0.3rem 1rem; }
+      .dual-side { padding: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen 1: Home View -->
+  <div id="home-view" class="screen active">
+    <div class="home-card">
+      <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">🗺️</div>
+      <h1 class="home-title">香港十八行政分區<br>快問快答</h1>
+      <p class="home-subtitle">Hong Kong 18 Districts Speed Quiz</p>
+      
+      <button class="mode-btn" onclick="showSingleSetup()">
+        <span>👤 單人練習模式 Single Player</span>
+      </button>
+      
+      <button class="mode-btn" style="background-color: #0284c7;" onclick="startDualGame()">
+        <span>⚔️ Smartboard 雙人對戰 Dual Battle</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Screen 2: Single Player Setup Modal -->
+  <div id="single-setup-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 style="font-size: 1.8rem; font-weight: 800;">👤 單人練習模式</h2>
+      <div class="input-group">
+        <label class="input-label" for="player-name-input">請輸入學生姓名：</label>
+        <input type="text" id="player-name-input" class="name-input" value="常識小探險家 Explorer" maxlength="12">
+      </div>
+      <div style="display: flex; gap: 1rem;">
+        <button class="mode-btn" style="background-color: #64748b;" onclick="closeSingleSetup()">返回 Main Menu</button>
+        <button class="mode-btn" onclick="startSingleGame()">開始遊戲 START</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 3: Single Player Game View -->
+  <div id="single-game-view" class="screen">
+    <div class="game-container">
+      <div class="game-header">
+        <div class="info-badge">
+          <span>👤</span> <span id="sp-name-display">常識小探險家</span>
+        </div>
+        <div class="timer-badge">
+          ⏱️ <span id="sp-timer">30</span>s
+        </div>
+        <div class="score-badge">
+          🏆 <span id="sp-score">0</span>
+        </div>
+      </div>
+
+      <div id="sp-question-card" class="question-card">
+        <div id="sp-district-zh" class="district-zh">--區</div>
+        <div id="sp-district-en" class="district-en">-- District</div>
+      </div>
+
+      <div class="options-grid">
+        <button class="option-btn" onclick="handleSingleAnswer('HK')">
+          <span>香港</span>
+          <span class="opt-en">Hong Kong</span>
+        </button>
+        <button class="option-btn" onclick="handleSingleAnswer('KLN')">
+          <span>九龍</span>
+          <span class="opt-en">Kowloon</span>
+        </button>
+        <button class="option-btn" onclick="handleSingleAnswer('NT')">
+          <span>新界</span>
+          <span class="opt-en">New Territories</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 4: Single Player Result Modal -->
+  <div id="single-result-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">🎉</div>
+      <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem;">挑戰完成！</h2>
+      <p id="sp-result-name" style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 1.5rem; font-weight: 700;"></p>
+
+      <div style="background: #f8fafc; padding: 1rem; border-radius: 1rem; margin-bottom: 1.5rem; border: 2px solid #e2e8f0;">
+        <div class="stat-row">
+          <span>最終總得分 Final Score</span>
+          <span id="sp-res-score" class="stat-value" style="font-size: 1.6rem;">0</span>
+        </div>
+        <div class="stat-row">
+          <span>答對題數 Correct</span>
+          <span id="sp-res-correct" class="stat-value" style="color: var(--correct-color);">0</span>
+        </div>
+        <div class="stat-row">
+          <span>答錯題數 Incorrect</span>
+          <span id="sp-res-wrong" class="stat-value" style="color: var(--wrong-color);">0</span>
+        </div>
+        <div class="stat-row">
+          <span>正確率 Accuracy</span>
+          <span id="sp-res-accuracy" class="stat-value">0%</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 1rem;">
+        <button class="mode-btn" style="background-color: #64748b;" onclick="returnToHome()">主頁 Menu</button>
+        <button class="mode-btn" onclick="startSingleGame()">再玩一次 Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 5: Smartboard Dual Player Battle View -->
+  <div id="dual-game-view" class="screen" style="padding: 0; max-width: 100%;">
+    <div class="dual-screen-container">
+      <div class="dual-timer-center">
+        ⏱️ <span id="dp-timer">30</span>
+      </div>
+
+      <!-- Left Side: Blue Team -->
+      <div class="dual-side side-blue">
+        <div class="dual-header">
+          <span class="team-title">🟦 藍隊 Blue Team</span>
+          <span class="score-badge" style="color: var(--blue-team);">得分: <span id="dp-blue-score">0</span></span>
+        </div>
+
+        <div id="dp-blue-card" class="dual-question-card">
+          <div id="dp-blue-zh" class="district-zh">--區</div>
+          <div id="dp-blue-en" class="district-en">-- District</div>
+        </div>
+
+        <div class="dual-options-grid">
+          <button class="dual-option-btn" onclick="handleDualAnswer('blue', 'HK')">
+            <span>香港</span>
+            <span class="opt-en">Hong Kong</span>
+          </button>
+          <button class="dual-option-btn" onclick="handleDualAnswer('blue', 'KLN')">
+            <span>九龍</span>
+            <span class="opt-en">Kowloon</span>
+          </button>
+          <button class="dual-option-btn" onclick="handleDualAnswer('blue', 'NT')">
+            <span>新界</span>
+            <span class="opt-en">New Territories</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Side: Red Team -->
+      <div class="dual-side side-red">
+        <div class="dual-header">
+          <span class="team-title">🟥 紅隊 Red Team</span>
+          <span class="score-badge" style="color: var(--red-team);">得分: <span id="dp-red-score">0</span></span>
+        </div>
+
+        <div id="dp-red-card" class="dual-question-card">
+          <div id="dp-red-zh" class="district-zh">--區</div>
+          <div id="dp-red-en" class="district-en">-- District</div>
+        </div>
+
+        <div class="dual-options-grid">
+          <button class="dual-option-btn" onclick="handleDualAnswer('red', 'HK')">
+            <span>香港</span>
+            <span class="opt-en">Hong Kong</span>
+          </button>
+          <button class="dual-option-btn" onclick="handleDualAnswer('red', 'KLN')">
+            <span>九龍</span>
+            <span class="opt-en">Kowloon</span>
+          </button>
+          <button class="dual-option-btn" onclick="handleDualAnswer('red', 'NT')">
+            <span>新界</span>
+            <span class="opt-en">New Territories</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 6: Dual Player Battle Result Modal -->
+  <div id="dual-result-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 650px;">
+      <div id="dp-winner-banner" class="result-winner-banner">🏆 藍隊勝出！</div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <!-- Blue Stats -->
+        <div style="background: #f0f9ff; padding: 1rem; border-radius: 1rem; border: 2px solid #bae6fd;">
+          <h3 style="color: var(--blue-team); font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem;">🟦 藍隊 Blue</h3>
+          <div class="stat-row"><span>得分</span><span id="dp-res-blue-score" class="stat-value">0</span></div>
+          <div class="stat-row"><span>答對</span><span id="dp-res-blue-correct" class="stat-value" style="color: var(--correct-color);">0</span></div>
+          <div class="stat-row"><span>答錯</span><span id="dp-res-blue-wrong" class="stat-value" style="color: var(--wrong-color);">0</span></div>
+        </div>
+
+        <!-- Red Stats -->
+        <div style="background: #fff1f2; padding: 1rem; border-radius: 1rem; border: 2px solid #fecdd3;">
+          <h3 style="color: var(--red-team); font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem;">🟥 紅隊 Red</h3>
+          <div class="stat-row"><span>得分</span><span id="dp-res-red-score" class="stat-value">0</span></div>
+          <div class="stat-row"><span>答對</span><span id="dp-res-red-correct" class="stat-value" style="color: var(--correct-color);">0</span></div>
+          <div class="stat-row"><span>答錯</span><span id="dp-res-red-wrong" class="stat-value" style="color: var(--wrong-color);">0</span></div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 1rem;">
+        <button class="mode-btn" style="background-color: #64748b;" onclick="returnToHome()">主頁 Menu</button>
+        <button class="mode-btn" style="background-color: #0284c7;" onclick="startDualGame()">重新對戰 Rematch</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 18 DISTRICTS DATA ---
+    const DISTRICTS = [
+      // 香港島 (HK)
+      { name: "中西區", en: "Central & Western District", region: "HK" },
+      { name: "灣仔區", en: "Wan Chai District", region: "HK" },
+      { name: "東區", en: "Eastern District", region: "HK" },
+      { name: "南區", en: "Southern District", region: "HK" },
+      
+      // 九龍 (KLN)
+      { name: "油尖旺區", en: "Yau Tsim Mong District", region: "KLN" },
+      { name: "深水埗區", en: "Sham Shui Po District", region: "KLN" },
+      { name: "九龍城區", en: "Kowloon City District", region: "KLN" },
+      { name: "黃大仙區", en: "Wong Tai Sin District", region: "KLN" },
+      { name: "觀塘區", en: "Kwun Tong District", region: "KLN" },
+      
+      // 新界 (NT)
+      { name: "葵青區", en: "Kwai Tsing District", region: "NT" },
+      { name: "荃灣區", en: "Tsuen Wan District", region: "NT" },
+      { name: "屯門區", en: "Tuen Mun District", region: "NT" },
+      { name: "元朗區", en: "Yuen Long District", region: "NT" },
+      { name: "北區", en: "North District", region: "NT" },
+      { name: "大埔區", en: "Tai Po District", region: "NT" },
+      { name: "沙田區", en: "Sha Tin District", region: "NT" },
+      { name: "西貢區", en: "Sai Kung District", region: "NT" },
+      { name: "離島區", en: "Islands District", region: "NT" }
+    ];
+
+    // --- NATIVE WEB AUDIO API SYNTHESIZER ---
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'correct') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.setValueAtTime(140, now + 0.08);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'finish') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.3);
+          gain.gain.setValueAtTime(0.4, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        }
+      } catch (e) {
+        console.warn("Audio playback error", e);
+      }
+    }
+
+    // --- GAME ENGINE STATE ---
+    let currentMode = 'home'; // 'single' or 'dual'
+    let timerReqId = null;
+    let gameStartTime = 0;
+    const GAME_DURATION = 30; // 30 seconds
+
+    // Fisher-Yates deck generator
+    function createShuffledDeck() {
+      const deck = [...DISTRICTS];
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[deck[i]]];
+      }
+      return deck;
+    }
+
+    // Player state structure
+    function createPlayerState() {
+      return {
+        deck: createShuffledDeck(),
+        deckIndex: 0,
+        score: 0,
+        correct: 0,
+        wrong: 0,
+        currentQuestion: null
+      };
+    }
+
+    function getNextQuestion(playerState) {
+      if (playerState.deckIndex >= playerState.deck.length) {
+        playerState.deck = createShuffledDeck();
+        playerState.deckIndex = 0;
+      }
+      const q = playerState.deck[playerState.deckIndex];
+      playerState.deckIndex++;
+      playerState.currentQuestion = q;
+      return q;
+    }
+
+    let singlePlayer = null;
+    let bluePlayer = null;
+    let redPlayer = null;
+
+    // --- HIGH PRECISION TIMER ENGINE ---
+    function startTimer() {
+      if (timerReqId) cancelAnimationFrame(timerReqId);
+      gameStartTime = performance.now();
+
+      function updateTimer(now) {
+        const elapsed = (now - gameStartTime) / 1000;
+        const remaining = Math.max(0, GAME_DURATION - elapsed);
+        const displaySec = Math.ceil(remaining);
+
+        if (currentMode === 'single') {
+          document.getElementById('sp-timer').innerText = displaySec;
+        } else if (currentMode === 'dual') {
+          document.getElementById('dp-timer').innerText = displaySec;
+        }
+
+        if (remaining > 0) {
+          timerReqId = requestAnimationFrame(updateTimer);
+        } else {
+          endGame();
+        }
+      }
+
+      timerReqId = requestAnimationFrame(updateTimer);
+    }
+
+    // --- NAVIGATION HELPERS ---
+    function switchScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function returnToHome() {
+      if (timerReqId) cancelAnimationFrame(timerReqId);
+      currentMode = 'home';
+      document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+      switchScreen('home-view');
+    }
+
+    // --- SINGLE PLAYER LOGIC ---
+    function showSingleSetup() {
+      initAudio();
+      document.getElementById('single-setup-modal').classList.add('active');
+    }
+
+    function closeSingleSetup() {
+      document.getElementById('single-setup-modal').classList.remove('active');
+    }
+
+    function startSingleGame() {
+      initAudio();
+      closeSingleSetup();
+      document.getElementById('single-result-modal').classList.remove('active');
+
+      const nameInput = document.getElementById('player-name-input').value.trim();
+      const playerName = nameInput || "常識小探險家";
+      document.getElementById('sp-name-display').innerText = playerName;
+
+      currentMode = 'single';
+      singlePlayer = createPlayerState();
+      
+      updateSingleScoreDisplay();
+      renderNextSingleQuestion();
+      
+      switchScreen('single-game-view');
+      startTimer();
+    }
+
+    function updateSingleScoreDisplay() {
+      document.getElementById('sp-score').innerText = singlePlayer.score;
+    }
+
+    function renderNextSingleQuestion() {
+      const q = getNextQuestion(singlePlayer);
+      document.getElementById('sp-district-zh').innerText = q.name;
+      document.getElementById('sp-district-en').innerText = q.en;
+    }
+
+    function handleSingleAnswer(selectedRegion) {
+      if (!singlePlayer || !singlePlayer.currentQuestion) return;
+
+      const card = document.getElementById('sp-question-card');
+      const isCorrect = (selectedRegion === singlePlayer.currentQuestion.region);
+
+      if (isCorrect) {
+        singlePlayer.score += 2;
+        singlePlayer.correct++;
+        playSound('correct');
+        card.classList.add('flash-correct');
+      } else {
+        singlePlayer.score -= 1;
+        singlePlayer.wrong++;
+        playSound('wrong');
+        card.classList.add('flash-wrong');
+      }
+
+      updateSingleScoreDisplay();
+
+      // Non-blocking 150ms visual flash, immediately proceed to next question
+      setTimeout(() => {
+        card.classList.remove('flash-correct', 'flash-wrong');
+      }, 150);
+
+      renderNextSingleQuestion();
+    }
+
+    // --- SMARTBOARD DUAL PLAYER LOGIC ---
+    function startDualGame() {
+      initAudio();
+      document.getElementById('dual-result-modal').classList.remove('active');
+
+      currentMode = 'dual';
+      bluePlayer = createPlayerState();
+      redPlayer = createPlayerState();
+
+      document.getElementById('dp-blue-score').innerText = '0';
+      document.getElementById('dp-red-score').innerText = '0';
+
+      renderNextDualQuestion('blue');
+      renderNextDualQuestion('red');
+
+      switchScreen('dual-game-view');
+      startTimer();
+    }
+
+    function renderNextDualQuestion(team) {
+      const player = (team === 'blue') ? bluePlayer : redPlayer;
+      const q = getNextQuestion(player);
+      document.getElementById(`dp-${team}-zh`).innerText = q.name;
+      document.getElementById(`dp-${team}-en`).innerText = q.en;
+    }
+
+    function handleDualAnswer(team, selectedRegion) {
+      const player = (team === 'blue') ? bluePlayer : redPlayer;
+      if (!player || !player.currentQuestion) return;
+
+      const card = document.getElementById(`dp-${team}-card`);
+      const isCorrect = (selectedRegion === player.currentQuestion.region);
+
+      if (isCorrect) {
+        player.score += 2;
+        player.correct++;
+        playSound('correct');
+        card.classList.add('flash-correct');
+      } else {
+        player.score -= 1;
+        player.wrong++;
+        playSound('wrong');
+        card.classList.add('flash-wrong');
+      }
+
+      document.getElementById(`dp-${team}-score`).innerText = player.score;
+
+      setTimeout(() => {
+        card.classList.remove('flash-correct', 'flash-wrong');
+      }, 150);
+
+      renderNextDualQuestion(team);
+    }
+
+    // --- GAME END & RESULTS LOGIC ---
+    function endGame() {
+      if (timerReqId) cancelAnimationFrame(timerReqId);
+      playSound('finish');
+
+      if (currentMode === 'single') {
+        const name = document.getElementById('sp-name-display').innerText;
+        const total = singlePlayer.correct + singlePlayer.wrong;
+        const accuracy = total > 0 ? Math.round((singlePlayer.correct / total) * 100) : 0;
+
+        document.getElementById('sp-result-name').innerText = `玩家：${name}`;
+        document.getElementById('sp-res-score').innerText = singlePlayer.score;
+        document.getElementById('sp-res-correct').innerText = singlePlayer.correct;
+        document.getElementById('sp-res-wrong').innerText = singlePlayer.wrong;
+        document.getElementById('sp-res-accuracy').innerText = `${accuracy}%`;
+
+        document.getElementById('single-result-modal').classList.add('active');
+      } else if (currentMode === 'dual') {
+        document.getElementById('dp-res-blue-score').innerText = bluePlayer.score;
+        document.getElementById('dp-res-blue-correct').innerText = bluePlayer.correct;
+        document.getElementById('dp-res-blue-wrong').innerText = bluePlayer.wrong;
+
+        document.getElementById('dp-res-red-score').innerText = redPlayer.score;
+        document.getElementById('dp-res-red-correct').innerText = redPlayer.correct;
+        document.getElementById('dp-res-red-wrong').innerText = redPlayer.wrong;
+
+        const banner = document.getElementById('dp-winner-banner');
+        if (bluePlayer.score > redPlayer.score) {
+          banner.innerText = '🏆 藍隊獲勝！ Blue Team Wins!';
+          banner.style.color = 'var(--blue-team)';
+        } else if (redPlayer.score > bluePlayer.score) {
+          banner.innerText = '🏆 紅隊獲勝！ Red Team Wins!';
+          banner.style.color = 'var(--red-team)';
+        } else {
+          banner.innerText = '🤝 勢均力敵（平手）! It\'s a Tie!';
+          banner.style.color = '#d97706';
+        }
+
+        document.getElementById('dual-result-modal').classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>
