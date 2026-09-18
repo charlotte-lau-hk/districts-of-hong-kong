@@ -56,7 +56,6 @@
       display: flex;
     }
 
-    /* Home Screen Styles */
     .home-card {
       background: var(--card-bg);
       padding: 2.5rem 2rem;
@@ -107,7 +106,6 @@
       background-color: var(--btn-blue-hover);
     }
 
-    /* Single Player Game Styles */
     .game-container {
       width: 100%;
       max-width: 600px;
@@ -180,20 +178,23 @@
       color: var(--text-muted);
     }
 
-    /* Options Buttons Layout (Unified Blue Color) */
-    .options-grid {
+    .options-grid, .dual-options-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
       width: 100%;
+      box-sizing: border-box;
     }
 
-    .option-btn {
+    .option-btn, .dual-option-btn {
+      width: 100%;
+      min-width: 0; /* Prevents grid items from stretching unevenly based on content */
+      box-sizing: border-box;
       background-color: var(--btn-blue);
       color: #ffffff;
       border: none;
       border-radius: 1.25rem;
-      padding: 1.5rem 0.5rem;
+      padding: 1.5rem 0.25rem;
       font-size: 1.6rem;
       font-weight: 800;
       cursor: pointer;
@@ -206,18 +207,24 @@
       transition: transform 0.08s ease, box-shadow 0.08s ease;
     }
 
-    .option-btn .opt-en {
+    .option-btn .opt-en, .dual-option-btn .opt-en {
       font-size: 0.85rem;
       font-weight: 600;
       opacity: 0.9;
     }
 
-    .option-btn:active {
+    .option-btn:active, .dual-option-btn:active {
       transform: translateY(4px);
       box-shadow: 0 2px 0px #1d4ed8, 0 4px 6px -1px rgba(37, 99, 235, 0.3);
     }
 
-    /* Feedback Animations */
+    .dual-option-btn {
+      padding: 1.8rem 0.25rem;
+      font-size: 1.7rem;
+      font-weight: 900;
+      box-shadow: 0 6px 0px #1d4ed8;
+    }
+
     .flash-correct {
       border-color: var(--correct-color) !important;
       background-color: #f0fdf4 !important;
@@ -242,7 +249,6 @@
       75% { transform: translateX(8px); }
     }
 
-    /* Dual Player Smartboard Screen */
     .dual-screen-container {
       width: 100vw;
       height: 100vh;
@@ -311,37 +317,6 @@
       font-size: 3rem;
     }
 
-    /* Extra Wide/Large buttons for Dual Smartboard */
-    .dual-options-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.25rem;
-      width: 100%;
-      margin-bottom: 0.5rem;
-    }
-
-    .dual-option-btn {
-      background-color: var(--btn-blue);
-      color: #ffffff;
-      border: none;
-      border-radius: 1.25rem;
-      padding: 2rem 0.5rem;
-      font-size: 1.8rem;
-      font-weight: 900;
-      cursor: pointer;
-      box-shadow: 0 6px 0px #1d4ed8;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-    }
-
-    .dual-option-btn:active {
-      transform: translateY(4px);
-      box-shadow: 0 2px 0px #1d4ed8;
-    }
-
     .dual-timer-center {
       position: absolute;
       top: 1rem;
@@ -358,7 +333,6 @@
       box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
 
-    /* Modals & Inputs */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -435,7 +409,6 @@
       margin-bottom: 1rem;
     }
 
-    /* Responsiveness for mobile screens */
     @media (max-width: 640px) {
       .district-zh { font-size: 2.4rem; }
       .option-btn { font-size: 1.3rem; padding: 1.25rem 0.25rem; }
@@ -448,7 +421,6 @@
 </head>
 <body>
 
-  <!-- Screen 1: Home View -->
   <div id="home-view" class="screen active">
     <div class="home-card">
       <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">🗺️</div>
@@ -465,7 +437,6 @@
     </div>
   </div>
 
-  <!-- Screen 2: Single Player Setup Modal -->
   <div id="single-setup-modal" class="modal-overlay">
     <div class="modal-card">
       <h2 style="font-size: 1.8rem; font-weight: 800;">👤 單人練習模式</h2>
@@ -474,13 +445,12 @@
         <input type="text" id="player-name-input" class="name-input" value="常識小探險家 Explorer" maxlength="12">
       </div>
       <div style="display: flex; gap: 1rem;">
-        <button class="mode-btn" style="background-color: #64748b;" onclick="closeSingleSetup()">返回 Main Menu</button>
+        <button class="mode-btn" style="background-color: #64748b;" onclick="closeSingleSetup()">主頁 Menu</button>
         <button class="mode-btn" onclick="startSingleGame()">開始遊戲 START</button>
       </div>
     </div>
   </div>
 
-  <!-- Screen 3: Single Player Game View -->
   <div id="single-game-view" class="screen">
     <div class="game-container">
       <div class="game-header">
@@ -488,7 +458,7 @@
           <span>👤</span> <span id="sp-name-display">常識小探險家</span>
         </div>
         <div class="timer-badge">
-          ⏱️ <span id="sp-timer">30</span>s
+          ⏱️ <span id="sp-timer">15</span>s
         </div>
         <div class="score-badge">
           🏆 <span id="sp-score">0</span>
@@ -517,7 +487,6 @@
     </div>
   </div>
 
-  <!-- Screen 4: Single Player Result Modal -->
   <div id="single-result-modal" class="modal-overlay">
     <div class="modal-card">
       <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">🎉</div>
@@ -545,16 +514,15 @@
 
       <div style="display: flex; gap: 1rem;">
         <button class="mode-btn" style="background-color: #64748b;" onclick="returnToHome()">主頁 Menu</button>
-        <button class="mode-btn" onclick="startSingleGame()">再玩一次 Again</button>
+        <button class="mode-btn" onclick="returnToHome()">再玩一次 Play Again</button>
       </div>
     </div>
   </div>
 
-  <!-- Screen 5: Smartboard Dual Player Battle View -->
   <div id="dual-game-view" class="screen" style="padding: 0; max-width: 100%;">
     <div class="dual-screen-container">
       <div class="dual-timer-center">
-        ⏱️ <span id="dp-timer">30</span>
+        ⏱️ <span id="dp-timer">15</span>
       </div>
 
       <!-- Left Side: Blue Team -->
@@ -615,7 +583,6 @@
     </div>
   </div>
 
-  <!-- Screen 6: Dual Player Battle Result Modal -->
   <div id="dual-result-modal" class="modal-overlay">
     <div class="modal-card" style="max-width: 650px;">
       <div id="dp-winner-banner" class="result-winner-banner">🏆 藍隊勝出！</div>
@@ -640,13 +607,12 @@
 
       <div style="display: flex; gap: 1rem;">
         <button class="mode-btn" style="background-color: #64748b;" onclick="returnToHome()">主頁 Menu</button>
-        <button class="mode-btn" style="background-color: #0284c7;" onclick="startDualGame()">重新對戰 Rematch</button>
+        <button class="mode-btn" style="background-color: #0284c7;" onclick="returnToHome()">再玩一次 Play Again</button>
       </div>
     </div>
   </div>
 
   <script>
-    // --- 18 DISTRICTS DATA ---
     const DISTRICTS = [
       // 香港島 (HK)
       { name: "中西區", en: "Central & Western District", region: "HK" },
@@ -673,7 +639,6 @@
       { name: "離島區", en: "Islands District", region: "NT" }
     ];
 
-    // --- NATIVE WEB AUDIO API SYNTHESIZER ---
     let audioCtx = null;
 
     function initAudio() {
@@ -725,18 +690,17 @@
       }
     }
 
-    // --- GAME ENGINE STATE ---
     let currentMode = 'home'; // 'single' or 'dual'
     let timerReqId = null;
     let gameStartTime = 0;
-    const GAME_DURATION = 30; // 30 seconds
+    const GAME_DURATION = 15; // Adjusted timer duration to 15 seconds
 
     // Fisher-Yates deck generator
     function createShuffledDeck() {
       const deck = [...DISTRICTS];
       for (let i = deck.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[deck[i]]];
+        [deck[i], deck[j]] = [deck[j], deck[i]];
       }
       return deck;
     }
@@ -754,7 +718,8 @@
     }
 
     function getNextQuestion(playerState) {
-      if (playerState.deckIndex >= playerState.deck.length) {
+      if (!playerState) return null;
+      if (!playerState.deck || playerState.deckIndex >= playerState.deck.length) {
         playerState.deck = createShuffledDeck();
         playerState.deckIndex = 0;
       }
@@ -768,7 +733,6 @@
     let bluePlayer = null;
     let redPlayer = null;
 
-    // --- HIGH PRECISION TIMER ENGINE ---
     function startTimer() {
       if (timerReqId) cancelAnimationFrame(timerReqId);
       gameStartTime = performance.now();
@@ -794,7 +758,6 @@
       timerReqId = requestAnimationFrame(updateTimer);
     }
 
-    // --- NAVIGATION HELPERS ---
     function switchScreen(screenId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(screenId).classList.add('active');
@@ -807,7 +770,6 @@
       switchScreen('home-view');
     }
 
-    // --- SINGLE PLAYER LOGIC ---
     function showSingleSetup() {
       initAudio();
       document.getElementById('single-setup-modal').classList.add('active');
@@ -841,9 +803,12 @@
     }
 
     function renderNextSingleQuestion() {
+      if (!singlePlayer) return;
       const q = getNextQuestion(singlePlayer);
-      document.getElementById('sp-district-zh').innerText = q.name;
-      document.getElementById('sp-district-en').innerText = q.en;
+      if (q) {
+        document.getElementById('sp-district-zh').innerText = q.name;
+        document.getElementById('sp-district-en').innerText = q.en;
+      }
     }
 
     function handleSingleAnswer(selectedRegion) {
@@ -874,7 +839,6 @@
       renderNextSingleQuestion();
     }
 
-    // --- SMARTBOARD DUAL PLAYER LOGIC ---
     function startDualGame() {
       initAudio();
       document.getElementById('dual-result-modal').classList.remove('active');
@@ -895,9 +859,12 @@
 
     function renderNextDualQuestion(team) {
       const player = (team === 'blue') ? bluePlayer : redPlayer;
+      if (!player) return;
       const q = getNextQuestion(player);
-      document.getElementById(`dp-${team}-zh`).innerText = q.name;
-      document.getElementById(`dp-${team}-en`).innerText = q.en;
+      if (q) {
+        document.getElementById(`dp-${team}-zh`).innerText = q.name;
+        document.getElementById(`dp-${team}-en`).innerText = q.en;
+      }
     }
 
     function handleDualAnswer(team, selectedRegion) {
@@ -928,7 +895,6 @@
       renderNextDualQuestion(team);
     }
 
-    // --- GAME END & RESULTS LOGIC ---
     function endGame() {
       if (timerReqId) cancelAnimationFrame(timerReqId);
       playSound('finish');
